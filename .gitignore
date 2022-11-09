@@ -1,0 +1,11 @@
+.Rhistory
+.Rprofile
+.Rproj.user
+
+# Exclude original processing code from GH
+JessicaFluorCamCode.R
+Macrosystems_20220207_full_F0_analysis.R
+
+# Excluded inputs and outputs
+data_processed/
+data_raw/
