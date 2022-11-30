@@ -16,16 +16,20 @@ library(ggplot2)
 if(!dir.exists("data_raw/")) {
   dir.create("data_raw/")
 }
-
 if(!dir.exists("data_processed/")) {
   dir.create("data_processed/")
 }
-
+if(!dir.exists("data_labels/")) {
+  dir.create("data_labels/")
+}
 
 
 #### Add and detect new raw files ####
 
 # NOTE: Manually add Fluorcam .txt file to 'data_raw/'
+# NOTE: Manually add well names .csv file to 'data_labels/
+# Both must have identical file names
+
 
 new <- setdiff(list.files("data_raw/"), list.files("data_processed/"))
 
@@ -159,6 +163,10 @@ for(w in wells) {
  print(paste("Well", w, "complete")) 
 }
 
+#### Load well labels ####
+
+labs <- read_csv(paste0("data_labels/", strsplit(fn, ".TXT"), ".csv"))
+
 #### Create final product ####
 
 out_dat <- scale_dat %>% 
@@ -166,7 +174,10 @@ out_dat <- scale_dat %>%
   group_by(well) %>%
   summarize(Tmax = temp[which(fluor_scale == 1)], 
             T50 = temp[which.min(abs(fluor_scale[1:which(fluor_scale == 1)] - 0.5))]) %>%
-  left_join(Tcrits, by = "well")
+  left_join(Tcrits, by = "well") %>%
+  left_join(labs, by = "well") %>%
+  relocate(Tmax, T50, Tcrit, Tcrit_se, .after = last_col())
+
 
 write_csv(out_dat,
           file = paste0("data_processed/", strsplit(fn, ".TXT"), ".csv"))

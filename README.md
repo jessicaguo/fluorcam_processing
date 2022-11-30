@@ -16,6 +16,8 @@ Based on processing steps outlined in [Arnold et al. 2021](https://doi.org/10.10
 
 6.  Move a Fluorcam file (.txt) into `data_raw/`; rename if needed. I recommend keeping the YYYYMMDD as the first part of the file name so files will be chronologically ordered.
 
+7. Move the accompanying well labels file (.csv) into `data_labels/`; provide with the identical file name as the Fluorcam .txt. The initial column should be labeled `well` and consist of wells from A1, A2, ... H3 (n = 45). One or more additional custom columns can be specified, e.g., `site`, `species `, `sampleID`, etc. 
+
 7.  Run the remainder of `workflow.R`. When complete, `data_processed/` should contain one folder and one .csv file of the same name as the `data_raw/` input:
 
     -   The folder will contain a .png image for each well location (A1,A2, ... H4,) plotting the raw and fitted data with thermal limits (Tcrit, T50, Tmax).
@@ -33,6 +35,4 @@ Desired features still include:
 
 -   adding conditional to breakpoint for loop if model does not converge
 
--   joining with dataframe of sample identifiers for each well (not yet supplied)
-
--   adding `date_run` and `date_processed` columns to final output
+-   adding `date_run` and `date_processed` columns to final output - is `date_run` available as part of the Fluorcam file name?
