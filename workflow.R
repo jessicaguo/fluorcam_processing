@@ -39,14 +39,16 @@ fn <- new[1] # Assuming only one new file
 in_dat <- read_table(paste0("data_raw/", fn),
                      skip = 2) %>%
   rename(time = 1,
-         temp = 2) %>%
-  mutate(temp_bin = rep(seq(1, 120, by = 1), each = 5)) %>%
+         temp = 2)
+
+in_dat2 <- in_dat %>%
+  mutate(temp_bin = rep(1:(nrow(in_dat)/5), each = 5)) %>% # Group every 5 measurements
   relocate(temp_bin, .after = temp)
 
 #### Summarize mean fluorescence by temp and well ####
-# Note, actual temp has been replaced by the average of the 5 temps
+# Note: actual temp has been replaced by the average of the 5 temps
 
-sum_dat <- in_dat %>%
+sum_dat <- in_dat2 %>%
   pivot_longer(-1:-3, 
                names_to = "well",
                values_to = "fluor") %>%
