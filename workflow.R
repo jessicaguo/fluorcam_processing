@@ -39,17 +39,22 @@ fn <- new[1] # Assuming only one new file
 in_dat <- read_table(paste0("data_raw/", fn),
                      skip = 2) %>%
   rename(time = 1,
-         temp = 2)
+         temp = 2) %>%
+  mutate(temp_bin = rep(seq(1, 120, by = 1), each = 5)) %>%
+  relocate(temp_bin, .after = temp)
 
 #### Summarize mean fluorescence by temp and well ####
+# Note, actual temp has been replaced by the average of the 5 temps
 
 sum_dat <- in_dat %>%
-  pivot_longer(-1:-2, 
+  pivot_longer(-1:-3, 
                names_to = "well",
                values_to = "fluor") %>%
-  group_by(well, temp) %>%
-  summarize(fluor_mean = mean(fluor)) %>%
-  ungroup()
+  group_by(well, temp_bin) %>%
+  summarize(temp = mean(temp),
+            fluor_mean = mean(fluor)) %>%
+  ungroup() %>%
+  dplyr::select(-temp_bin)
 
 #### Detect outliers in fluorescence ####
 
