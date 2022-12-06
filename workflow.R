@@ -117,7 +117,7 @@ for(w in wells) {
   sub <- param_dat %>%
     filter(well == w, # one well at a time
            temp > T50 - x_prebuffer, # include temps within the prebuffer of T50
-           temp < Tmax + x_postbuffer) # and within the postbuffer of Tmax
+           temp < T50 + x_postbuffer) # and within the postbuffer of T50
   
   # Fit breakpoint model
   m1 <- lm(fluor_scale ~ temp, data = sub)
