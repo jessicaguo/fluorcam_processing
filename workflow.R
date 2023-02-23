@@ -34,7 +34,7 @@ if(!dir.exists("data_labels/")) {
 new <- setdiff(list.files("data_raw/"), list.files("data_processed/"))
 
 #### Load in data from data_raw/ ####
-fn <- new[1] # Assuming only one new file
+fn <- new[2] # Assuming only one new file
 
 in_dat <- read_table(paste0("data_raw/", fn),
                      skip = 2) %>%
@@ -75,14 +75,23 @@ scale_dat <- outlier_dat %>%
          Tmax = temp[which.max(fluor_mean)],
          fluor_min = min(fluor_mean[which(temp <= Tmax)]), # takes minimum of fluor_mean where temp was < Tmax
          Tmin = temp[which(fluor_mean == fluor_min)],
-         check = ifelse(Tmax > Tmin, TRUE, FALSE),
-         fluor_scale = (fluor_mean - fluor_min) / (fluor_max - fluor_min)) %>%
+         check = ifelse(Tmax > Tmin, TRUE, FALSE), # if FALSE, remove from further analysis
+         fluor_scale = ifelse(check == TRUE, 
+                              (fluor_mean - fluor_min) / (fluor_max - fluor_min),
+                              NA)) %>%
   ungroup()
+
+id_removed <- unique(scale_dat$well[scale_dat$check == FALSE])
+n_removed <- length(id_removed)
+
+print(paste0("Well failed requirement of Tmax > Tmin, ", id_removed,
+            " will be removed from downstream analysis"))
 
 #### Evaluate T50 and Tmax for scaled fluorescence by well ####
 
 param_dat <- scale_dat %>% 
   dplyr::select(well, temp, fluor_scale) %>%
+  filter(!is.na(fluor_scale)) %>%
   group_by(well) %>%
   mutate(Tmax = temp[which(fluor_scale == 1)], # temp at scaled fluorescence = 1
          T50 = temp[which.min(abs(fluor_scale[1:which(fluor_scale == 1)] - 0.5))]) # temp when scaled fluorescence is closest to 0.5 and occurs prior to Tmax
